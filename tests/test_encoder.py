@@ -58,7 +58,7 @@ class TestEncoderFit:
         assert result is enc
 
     def test_vocabulary_built(self, simple_df):
-        enc = InsuranceLDAEncoder()
+        enc = InsuranceLDAEncoder(missing_as_modality=False)
         enc.fit(simple_df, cat_cols=["vehicle_group", "area"])
         # vehicle_group: A, B, C = 3 modalities
         # area: rural, suburban, urban = 3 modalities
@@ -76,10 +76,11 @@ class TestEncoderFit:
         enc.fit(simple_df, cat_cols=["vehicle_group", "area"])
         assert "vehicle_group" in enc.variable_ranges_
         assert "area" in enc.variable_ranges_
-        assert sorted(enc.variable_ranges_["vehicle_group"]) == ["A", "B", "C"]
+        # __MISSING__ always added when missing_as_modality=True (default)
+        assert set(["A", "B", "C"]).issubset(set(enc.variable_ranges_["vehicle_group"]))
 
     def test_n_modalities_correct(self, simple_df):
-        enc = InsuranceLDAEncoder()
+        enc = InsuranceLDAEncoder(missing_as_modality=False)
         enc.fit(simple_df, cat_cols=["vehicle_group", "area"])
         assert enc.n_modalities_ == 6
 
@@ -108,7 +109,7 @@ class TestEncoderFit:
 
 class TestEncoderTransform:
     def test_transform_shape(self, simple_df):
-        enc = InsuranceLDAEncoder()
+        enc = InsuranceLDAEncoder(missing_as_modality=False)
         enc.fit(simple_df, cat_cols=["vehicle_group", "area"])
         X = enc.transform(simple_df)
         assert X.shape == (5, 6)

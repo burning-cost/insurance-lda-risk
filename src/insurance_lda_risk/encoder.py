@@ -320,7 +320,7 @@ class InsuranceLDAEncoder:
         """Sorted unique modalities (+ __MISSING__ if applicable)."""
         values = series.dropna().astype(str).unique()
         modalities = sorted(values.tolist())
-        if self.missing_as_modality and series.isna().any():
+        if self.missing_as_modality:
             modalities.append("__MISSING__")
         return modalities
 
